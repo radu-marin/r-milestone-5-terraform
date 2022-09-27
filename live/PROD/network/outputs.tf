@@ -3,9 +3,14 @@ output "main_vpc_id" {
     value = module.network.main_vpc_id
 }
 
-output "pub_subnet_id" {
-    description = "Public subnet id"
-    value = module.network.pub_subnet_id
+output "pub1_subnet_id" {
+    description = "Public subnet 1 id"
+    value = module.network.pub1_subnet_id
+}
+
+output "pub2_subnet_id" {
+    description = "Public subnet 2 id"
+    value = module.network.pub2_subnet_id
 }
 
 output "prv1_subnet_id" {

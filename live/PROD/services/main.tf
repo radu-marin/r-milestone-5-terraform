@@ -6,7 +6,7 @@ module "services" {
     environment = "PROD"
     owner = "radul" 
     region = "eu-central-1"       
-    network_remote_state_bucket = "r-milestone-5-tf-state"
+    network_remote_state_bucket = "r-milestone-5-tf-state-personal"
     network_remote_state_key = "PROD/network/terraform.tfstate"
     web_server_ami = "ami-0e2031728ef69a466"
     web_server_instance_type = "t2.micro"

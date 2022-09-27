@@ -1,7 +1,7 @@
 # Create (DEV) MySQL RDS for webapp:
 module "mysql_data" {
     source = "../../../modules/data-storage"
-    #to try and check if it works with github:
+    #to try and check if it works with github, an example:
     #source = "git::git@github.com:radu-marin/terraform-up-and-running-modules.git?ref=v0.0.1"
     environment ="PROD"
     owner = "radul-terraform"
