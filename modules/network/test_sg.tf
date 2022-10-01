@@ -1,7 +1,34 @@
 # # !!!!!!!!! WIP !!!!!!!!!!!!! 
 # # this file will be used just to practice with dynamic blocks, fors and conditionals
 
+# <=========================   SUBNETS   =========================>
+# dynamic blocks for subnets
 
+# Create Public Subnets
+resource "aws_subnet" "public_subnets" {
+    count = length(toset(var.public_subnets)) #convert to set to avoid duplicates
+    vpc_id = aws_vpc.main_vpc.id
+    cidr_block = var.public_subnets[count.index]
+    availability_zone = var.availability_zones[count.index]
+    tags = {
+        Name = "r-milestone-5-${var.environment}-pub-subnet-${count.index+1}"
+        Owner = "${var.owner}"
+    }
+}
+
+# Create Private Subnets
+resource "aws_subnet" "private_subnets" {
+    count = length(toset(var.private_subnets)) #convert to set to avoid duplicates
+    vpc_id = aws_vpc.main_vpc.id
+    cidr_block = var.private_subnets[count.index]
+    availability_zone = var.availability_zones[count.index]
+    tags = {
+        Name = "r-milestone-5-${var.environment}-prv-subnet-${count.index+1}"
+        Owner = "${var.owner}"
+    }
+}
+
+# <=====================   SECURITY GROUPS   =====================>
 # # <----------------------  PUBLIC
 # # Create VPC Security Group for public instances
 # locals {

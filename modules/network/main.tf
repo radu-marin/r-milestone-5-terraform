@@ -139,55 +139,55 @@ resource "aws_security_group_rule" "egress_all_prv" {
 
 
 # <=========================   SUBNETS   =========================>
-# Create Public Subnet 1
-resource "aws_subnet" "public_subnet_1" {
-    vpc_id = aws_vpc.main_vpc.id
-    cidr_block = var.public_subnet_1_cidr
-    availability_zone = "${var.region}a"
-    tags = {
-        Name = "r-milestone-5-${var.environment}-pub-subnet-1"
-        Owner = "${var.owner}"
-    }
-}
+# # Create Public Subnet 1
+# resource "aws_subnet" "public_subnet_1" {
+#     vpc_id = aws_vpc.main_vpc.id
+#     cidr_block = var.public_subnet_1_cidr
+#     availability_zone = "${var.region}a"
+#     tags = {
+#         Name = "r-milestone-5-${var.environment}-pub-subnet-1"
+#         Owner = "${var.owner}"
+#     }
+# }
 
-# Create Public Subnet 2
-resource "aws_subnet" "public_subnet_2" {
-    vpc_id = aws_vpc.main_vpc.id
-    cidr_block = var.public_subnet_2_cidr
-    availability_zone = "${var.region}b"
-    tags = {
-        Name = "r-milestone-5-${var.environment}-pub-subnet-2"
-        Owner = "${var.owner}"
-    }
-}
+# # Create Public Subnet 2
+# resource "aws_subnet" "public_subnet_2" {
+#     vpc_id = aws_vpc.main_vpc.id
+#     cidr_block = var.public_subnet_2_cidr
+#     availability_zone = "${var.region}b"
+#     tags = {
+#         Name = "r-milestone-5-${var.environment}-pub-subnet-2"
+#         Owner = "${var.owner}"
+#     }
+# }
 
 # Create Private Subnet 1
-resource "aws_subnet" "private_subnet_1" {
-    vpc_id = aws_vpc.main_vpc.id
-    cidr_block = var.private_subnet_1_cidr
-    availability_zone = "${var.region}a"
-    tags = {
-        Name = "r-milestone-5-${var.environment}-prv1-subnet"
-        Owner = "${var.owner}"
-    }    
-}
+# resource "aws_subnet" "private_subnet_1" {
+#     vpc_id = aws_vpc.main_vpc.id
+#     cidr_block = var.private_subnet_1_cidr
+#     availability_zone = "${var.region}a"
+#     tags = {
+#         Name = "r-milestone-5-${var.environment}-prv1-subnet"
+#         Owner = "${var.owner}"
+#     }    
+# }
 
-# Create Private Subnet 2
-resource "aws_subnet" "private_subnet_2" {
-    vpc_id = aws_vpc.main_vpc.id
-    cidr_block = var.private_subnet_2_cidr
-    availability_zone = "${var.region}b"
-    tags = {
-        Name = "r-milestone-5-${var.environment}-prv2-subnet"
-        Owner = "${var.owner}"
-    }    
-}
+# # Create Private Subnet 2
+# resource "aws_subnet" "private_subnet_2" {
+#     vpc_id = aws_vpc.main_vpc.id
+#     cidr_block = var.private_subnet_2_cidr
+#     availability_zone = "${var.region}b"
+#     tags = {
+#         Name = "r-milestone-5-${var.environment}-prv2-subnet"
+#         Owner = "${var.owner}"
+#     }    
+# }
 
 # <======================   DB SUBNET GROUP   ======================>
 # Create a db subnet group, needs at least 2 subnets in 2AZ's
 resource "aws_db_subnet_group" "default" {
   name       = var.db_subnet_group_name
-  subnet_ids = [aws_subnet.private_subnet_2.id, aws_subnet.private_subnet_1.id]
+  subnet_ids = [aws_subnet.private_subnets[0].id, aws_subnet.private_subnets[1].id]
 
   tags = {
     Name = "r-milestone-5-${var.environment}-db-subnet-group"
@@ -217,7 +217,7 @@ resource "aws_eip" "nat-eip" {
 # Create NAT Gateway and place it in the public subnet
 resource "aws_nat_gateway" "NAT" {
     allocation_id = aws_eip.nat-eip.id
-    subnet_id = aws_subnet.public_subnet_1.id
+    subnet_id = aws_subnet.public_subnets[0].id
     tags = {
         Name = "r-milestone-5-${var.environment}-nat-gw"
         Owner = "${var.owner}"
@@ -246,13 +246,13 @@ resource "aws_route" "igw" {
 
 # Create route table association of public route table with public subnet 1
 resource "aws_route_table_association" "public_1" {
-    subnet_id = aws_subnet.public_subnet_1.id
+    subnet_id = aws_subnet.public_subnets[0].id
     route_table_id = aws_route_table.public.id
 }
 
 # Create route table association of public route table with public subnet 2
 resource "aws_route_table_association" "public_2" {
-    subnet_id = aws_subnet.public_subnet_2.id
+    subnet_id = aws_subnet.public_subnets[1].id
     route_table_id = aws_route_table.public.id
 }
 
@@ -275,13 +275,13 @@ resource "aws_route" "nat" {
 
 # Create route table association of private route table with private subnet 1
 resource "aws_route_table_association" "private_1" {
-    subnet_id = aws_subnet.private_subnet_1.id
+    subnet_id = aws_subnet.private_subnets[0].id
     route_table_id = aws_route_table.private.id
 }
 
 # Create route table association of private route table with private subnet 2
 resource "aws_route_table_association" "private_2" {
-    subnet_id = aws_subnet.private_subnet_2.id
+    subnet_id = aws_subnet.private_subnets[1].id
     route_table_id = aws_route_table.private.id
 }
 

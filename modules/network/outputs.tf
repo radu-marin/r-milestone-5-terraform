@@ -5,22 +5,22 @@ output "main_vpc_id" {
 
 output "pub1_subnet_id" {
     description = "Public subnet id"
-    value = aws_subnet.public_subnet_1.id
+    value = aws_subnet.public_subnets[0].id
 }
 
 output "pub2_subnet_id" {
     description = "Public subnet id"
-    value = aws_subnet.public_subnet_2.id
+    value = aws_subnet.public_subnets[1].id
 }
 
 output "prv1_subnet_id" {
     description = "Private subnet 1 id"
-    value = aws_subnet.private_subnet_1.id  
+    value = aws_subnet.private_subnets[0].id  
 }
 
 output "prv2_subnet_id" {
     description = "Private subnet 2 id"
-    value = aws_subnet.private_subnet_2.id  
+    value = aws_subnet.private_subnets[1].id  
 }
 
 output "pub_sg_id" {
