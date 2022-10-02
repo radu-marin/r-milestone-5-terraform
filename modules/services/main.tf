@@ -31,11 +31,11 @@ data "aws_secretsmanager_secret_version" "db_pass" {
 
 
 # <======================   EC2 INSTANCES   ======================>
-# Create an EC2 instance in private subnet, as webserver:
+# Create an EC2 instance in private subnet 1, as webserver:
 resource "aws_instance" "web_server" {
     ami = var.web_server_ami
     instance_type = var.web_server_instance_type
-    subnet_id = data.terraform_remote_state.network.outputs.prv1_subnet_id
+    subnet_id = data.terraform_remote_state.network.outputs.prv_subnets_id[0]
     vpc_security_group_ids = [data.terraform_remote_state.network.outputs.prv_sg_id] 
     
     user_data = templatefile("${path.module}/user-data-ws-single.tftpl",
@@ -56,11 +56,11 @@ resource "aws_instance" "web_server" {
     iam_instance_profile = aws_iam_instance_profile.ws_profile.id
 }
 
-# Create an EC2 instance in public subnet, as bastion:
+# Create an EC2 instance in public subnet 1, as bastion:
 resource "aws_instance" "bastion" {
     ami = var.bastion_ami
     instance_type = var.bastion_instance_type
-    subnet_id = data.terraform_remote_state.network.outputs.pub1_subnet_id
+    subnet_id = data.terraform_remote_state.network.outputs.pub_subnets_id[0]
     vpc_security_group_ids = [
     data.terraform_remote_state.network.outputs.pub_sg_id, 
     data.terraform_remote_state.network.outputs.bastion_sg_id
@@ -159,8 +159,8 @@ resource "aws_launch_configuration" "ws_asg_config" {
 resource "aws_autoscaling_group" "ws_asg" {
     launch_configuration = aws_launch_configuration.ws_asg_config.name
     vpc_zone_identifier = [
-        data.terraform_remote_state.network.outputs.prv1_subnet_id,
-        data.terraform_remote_state.network.outputs.prv2_subnet_id
+        data.terraform_remote_state.network.outputs.prv_subnets_id[0],
+        data.terraform_remote_state.network.outputs.prv_subnets_id[1]
     ]
 
     target_group_arns = [aws_lb_target_group.asg.arn]
@@ -185,10 +185,11 @@ resource "aws_lb" "alb_asg" {
     load_balancer_type = "application"
     # subnets public !!! ()
     subnets = [
-      data.terraform_remote_state.network.outputs.pub1_subnet_id,
-      data.terraform_remote_state.network.outputs.pub2_subnet_id
+      data.terraform_remote_state.network.outputs.pub_subnets_id[0],
+      data.terraform_remote_state.network.outputs.pub_subnets_id[1]
     ]
-    security_groups = [data.terraform_remote_state.network.outputs.pub_sg_id] #added after creating sg resource
+    security_groups = [data.terraform_remote_state.network.outputs.pub_sg_id,
+                      data.terraform_remote_state.network.outputs.alb_sg_id] #added after creating sg resource
 
     tags = {
       Name = "r-milestone-5-${var.environment}-alb"

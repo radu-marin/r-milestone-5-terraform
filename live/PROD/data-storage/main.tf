@@ -7,7 +7,7 @@ module "mysql_data" {
     owner = "radul-terraform"
     region = "eu-central-1"
 
-    network_remote_state_bucket = "r-milestone-5-tf-state"
+    network_remote_state_bucket = "r-milestone-5-tf-state-personal"
     network_remote_state_key = "PROD/network/terraform.tfstate"
 
     db_name = "prod"

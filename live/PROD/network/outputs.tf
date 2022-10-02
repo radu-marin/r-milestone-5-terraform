@@ -3,24 +3,14 @@ output "main_vpc_id" {
     value = module.network.main_vpc_id
 }
 
-output "pub1_subnet_id" {
-    description = "Public subnet 1 id"
-    value = module.network.pub1_subnet_id
+output "pub_subnets_id" {
+    description = "List of public subnets ids"
+    value = module.network.pub_subnets_id
 }
 
-output "pub2_subnet_id" {
-    description = "Public subnet 2 id"
-    value = module.network.pub2_subnet_id
-}
-
-output "prv1_subnet_id" {
-    description = "Private subnet 1 id"
-    value =  module.network.prv1_subnet_id
-}
-
-output "prv2_subnet_id" {
-    description = "Private subnet 2 id"
-    value =   module.network.prv2_subnet_id
+output "prv_subnets_id" {
+    description = "List of private subnets ids"
+    value = module.network.prv_subnets_id
 }
 
 output "pub_sg_id" {
@@ -36,6 +26,11 @@ output "prv_sg_id" {
 output "bastion_sg_id" {
     description = "bastion vpc security group (in pub subnet)"
     value = module.network.bastion_sg_id
+}
+
+output "alb_sg_id" {
+    description = "ALB vpc security group (located in pub subnets)"
+    value = module.network.alb_sg_id
 }
 
 output "db_subnet_group" {

@@ -10,7 +10,7 @@ terraform {
     key = "PROD/data-storage/terraform.tfstate"
     region = "eu-central-1" #seems var.region not allowed here !
 
-    dynamodb_table = "r-milestone-5-tf-state-locks"
+    dynamodb_table = "r-milestone-5-tf-state-personal-locks"
     encrypt = true
   }
 }

@@ -4,7 +4,7 @@
 module "services" {
     source = "../../../modules/services"
     environment = "PROD"
-    owner = "radul" 
+    owner = "radul-terraform" 
     region = "eu-central-1"       
     network_remote_state_bucket = "r-milestone-5-tf-state-personal"
     network_remote_state_key = "PROD/network/terraform.tfstate"
@@ -15,6 +15,6 @@ module "services" {
 
     webapp_repo_link = "https://github.com/RevianLabs/devops-webapp-sample"
 
-    db_remote_state_bucket = "r-milestone-5-tf-state"
+    db_remote_state_bucket = "r-milestone-5-tf-state-personal"
     db_remote_state_key = "PROD/data-storage/terraform.tfstate"
 }

@@ -3,24 +3,14 @@ output "main_vpc_id" {
     value = aws_vpc.main_vpc.id
 }
 
-output "pub1_subnet_id" {
-    description = "Public subnet id"
-    value = aws_subnet.public_subnets[0].id
+output "pub_subnets_id" {
+    description = "List of public subnets ids"
+    value = [for subnet in aws_subnet.public_subnets: subnet.id]
 }
 
-output "pub2_subnet_id" {
-    description = "Public subnet id"
-    value = aws_subnet.public_subnets[1].id
-}
-
-output "prv1_subnet_id" {
-    description = "Private subnet 1 id"
-    value = aws_subnet.private_subnets[0].id  
-}
-
-output "prv2_subnet_id" {
-    description = "Private subnet 2 id"
-    value = aws_subnet.private_subnets[1].id  
+output "prv_subnets_id" {
+    description = "List of private subnets ids"
+    value = [for subnet in aws_subnet.private_subnets: subnet.id]
 }
 
 output "pub_sg_id" {
@@ -34,8 +24,13 @@ output "prv_sg_id" {
 }
 
 output "bastion_sg_id" {
-    description = "bastion vpc security group (in pub subnet)"
+    description = "bastion vpc security group (located in pub subnet)"
     value = aws_security_group.bastion.id
+}
+
+output "alb_sg_id" {
+    description = "ALB vpc security group (located in pub subnets)"
+    value = aws_security_group.alb.id
 }
 
 output "db_subnet_group" {
