@@ -58,7 +58,7 @@ tool name: 'terraform', type: 'terraform'
     }
     
     // Deploy or Destroy the selected infrastructure
-    stage('${ACTION} for ${ENV}') {
+    stage("APPLY/DESTROY infra") {
         if (params.ACTION == "Apply"){
             sh '''
                 cd "live/${ENV}"
