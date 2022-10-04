@@ -21,7 +21,7 @@ properties([
     ])
 ])
 
-node {
+node{
     
     stage('Clean workspace'){
         cleanWs()
@@ -66,10 +66,12 @@ tool name: 'terraform', type: 'terraform'
                 terraform init 
                 terraform plan -out=plan
             '''
-            input message: 'Do you want to implement plan?', parameters: [choice(name: 'PLAN', choices: ['YES', 'NO'], description: 'Implement plan')]
-            sh 'echo ${PLAN}'
-            if (params.PLAN == 'YES') {
-                sh 'terraform apply "plan"'   
+            env.PLAN = input message: 'Do you want to implement plan?', parameters: [choice(name: 'PLAN', choices: ['YES', 'NO'], description: 'Implement plan')]
+            if (env.PLAN == 'YES') {
+                sh '''
+                    cd "live/${ENV}"
+                    terraform apply plan
+                '''
             }
         }
         if (params.ACTION == "Destroy"){
@@ -79,9 +81,12 @@ tool name: 'terraform', type: 'terraform'
                 terraform init 
                 terraform plan -destroy -out=plan
             '''
-            input message: 'Do you want to implement destruction plan?', parameters: [choice(name: 'PLAN', choices: ['YES', 'NO'], description: 'Implement plan')]
-            if (params.PLAN == 'YES') {
-                sh 'terraform apply "plan"'   
+            env.PLAN = input message: 'Do you want to implement destruction plan?', parameters: [choice(name: 'PLAN', choices: ['YES', 'NO'], description: 'Implement plan')]
+            if (env.PLAN == 'YES') {
+                sh '''
+                    cd "live/${ENV}"
+                    terraform apply plan
+                '''
             }
         }
     }
