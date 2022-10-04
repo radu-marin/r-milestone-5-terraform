@@ -1,18 +1,39 @@
-node{
+properties([
+    parameters([
+        password( name: 'AWS_ACCESS_KEY_ID', 
+                defaultValue: '', 
+                description: 'AWS Credentials: AWS access key ID'),
+        password( name: 'AWS_SECRET_ACCESS_KEY', 
+                defaultValue: '', 
+                description: 'AWS Credentials: AWS secret access key'),
+        string( name: 'GIT_URL',
+                defaultValue: 'https://github.com/radu-marin/r-milestone-5-terraform.git',
+                description: 'The github repository link'),
+        string( name: 'GIT_BRANCH',
+                defaultValue: 'make_pretty',
+                description: 'The github repository link'),
+        choice( name: 'ENV', 
+                choices: ['DEV/network', 'DEV/data-storage', 'DEV/services', 'PROD/network', 'PROD/data-storage', 'PROD/services', 'global/s3'], 
+                description: 'Choose deployment environment (correct order: network, data-storage, services)'),
+        choice( name: 'ACTION', 
+                choices: ['Apply', 'Destroy'], 
+                description: 'Choose the required action for infrastructure')        
+    ])
+])
+
+node {
     
     stage('Clean workspace'){
         cleanWs()
     }
     
     //clone terraform repo
-    // stage('Git Prep'){
-    //     sh '''
-    //     echo "Cloning git repo to following path: $(pwd)"
-    //     git clone https://github.com/radu-marin/r-milestone-5-terraform 
-    //     ls
-    //     '''
-    // }
-    
+    stage('Git Prep'){
+        sh 'echo "Cloning git repo to following path: $(pwd)"'
+        git branch: 'make_pretty', changelog: false, poll: false, url: 'https://github.com/radu-marin/r-milestone-5-terraform.git'
+        sh "ls"
+    }
+
 //might pe helpful if terraform not in path and kept somewhere on your local jenkins machine (?)
 tool name: 'terraform', type: 'terraform'
 
@@ -36,59 +57,36 @@ tool name: 'terraform', type: 'terraform'
         // '''
     }
     
-    // stage('Deploy s3 backend'){
-    //     //switch to live/global/s3 and deploy backend S3 for tf state
-    //     sh '''
-    //     cd "r-milestone-5-terraform/live/global/s3"
-    //     echo "Current working directory is: $(pwd)"
-    //     terraform init
-    //     terraform apply -auto-approve
-    //     '''
-    // }
-    
-    stage('Deploy network'){
-        //switch to network directory and deploy network
-        sh '''
-        cd "r-milestone-5-terraform/live/${ENV}/network"
-        echo "Current working directory is: $(pwd)"
-        terraform init 
-        terraform apply -auto-approve
-        '''
-        //without export can use:
-        //terraform init -backend-config="access_key=${AWS_ACCESS_KEY_ID}" -backend-config="secret_key=${AWS_SECRET_ACCESS_KEY}"
+    // Deploy or Destroy the selected infrastructure
+    stage('${ACTION} for ${ENV}') {
+        if (params.ACTION == "Apply"){
+            sh '''
+                cd "live/${ENV}"
+                echo "Current working directory is: $(pwd)"
+                terraform init 
+                terraform plan -out=plan
+            '''
+            input message: 'Do you want to implement plan?', parameters: [choice(name: 'PLAN', choices: ['YES', 'NO'], description: 'Implement plan')]
+            sh 'echo ${PLAN}'
+            if (params.PLAN == 'YES') {
+                sh 'terraform apply "plan"'   
+            }
+        }
+        if (params.ACTION == "Destroy"){
+            sh '''
+                cd "live/${ENV}"
+                echo "Current working directory is: $(pwd)"
+                terraform init 
+                terraform plan -destroy -out=plan
+            '''
+            input message: 'Do you want to implement destruction plan?', parameters: [choice(name: 'PLAN', choices: ['YES', 'NO'], description: 'Implement plan')]
+            if (params.PLAN == 'YES') {
+                sh 'terraform apply "plan"'   
+            }
+        }
     }
     
-    stage('Deploy data-storage'){
-        
-        //switch to data-storage directory and deploy MySQL DB for webapp
-        sh '''
-        cd r-milestone-5-terraform/live/${ENV}/data-storage
-        echo "Current working directory is: $(pwd)"
-        terraform init
-        terraform apply -auto-approve
-        '''
+    stage('Clean workspace'){
+        cleanWs()
     }
-    
-    stage('Deploy services'){
-        
-        //switch to services directory and deploy EC2 instances that host the webapp
-        sh '''
-        cd r-milestone-5-terraform/live/${ENV}/services
-        echo "Current working directory is: $(pwd)"
-        terraform init
-        terraform apply -auto-approve
-        '''
-    }
-    
-    // stage('Destroy everything'){
-    //     sh '''
-    //     cd r-milestone-5-terraform/live/${ENV}/services
-    //     terraform destroy -auto-approve
-    //     cd ../data-storage
-    //     terraform destroy -auto-approve
-    //     cd ../network
-    //     terraform destroy -auto-approve
-    //     '''
-    // }
-    
 }

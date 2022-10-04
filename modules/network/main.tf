@@ -14,6 +14,7 @@ resource "aws_vpc" "main_vpc" {
 # <----------------------  PUBLIC
 # Create VPC Security Group for public instances
 locals {
+    # poate schimbat cu var.pub_in_rules apelat din environment.
     pub_in_rules = [
         { port = 22, protocol = "tcp", type = "ingress", 
         cidr_block = var.company_vpn, description = "ingress (ssh) company vpn to public subnet" },
