@@ -5,13 +5,13 @@ node{
     }
     
     //clone terraform repo
-    stage('Git Prep'){
-        sh '''
-        echo "Cloning git repo to following path: $(pwd)"
-        git clone https://github.com/radu-marin/r-milestone-5-terraform 
-        ls
-        '''
-    }
+    // stage('Git Prep'){
+    //     sh '''
+    //     echo "Cloning git repo to following path: $(pwd)"
+    //     git clone https://github.com/radu-marin/r-milestone-5-terraform 
+    //     ls
+    //     '''
+    // }
     
 //might pe helpful if terraform not in path and kept somewhere on your local jenkins machine (?)
 tool name: 'terraform', type: 'terraform'
